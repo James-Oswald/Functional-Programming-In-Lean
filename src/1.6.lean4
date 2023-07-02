@@ -75,3 +75,44 @@ match xs, ys with
 
 #eval zip [1,2,3,4] [5,6,7,8,9]
 
+/-
+Write a polymorphic function take that returns the first n
+ entries in a list, where n
+ is a Nat. If the list contains fewer than n entries, then the
+resulting list should be the input list. 
+#eval take 3 ["bolete", "oyster"] should yield ["bolete", "oyster"],
+ and #eval take 1 ["bolete", "oyster"] should yield ["bolete"].
+-/
+
+def take : Nat -> List α -> List α
+| _, [] => []
+| 0, _ :: _ => []
+| n + 1, h :: t => h :: (take n t)
+
+#eval take 3 ["bolete", "oyster"]
+#eval take 1 ["bolete", "oyster"]
+
+
+--TODO: Revist these two I don't fully get what this is asking
+/-
+Using the analogy between types and arithmetic, write a function that
+distributes products over sums. In other words, it should have
+type α × (β ⊕ γ) → (α × β) ⊕ (α × γ).
+-/
+
+--def prodOverSum {α β γ : Type} (t : α × (β ⊕ γ)) : _ := 
+--Sum (Prod t.fst t.snd.inl) (Prod t.fst t.snd.inr)
+
+
+def prodOverSum {α β γ : Type} : Prod α (Sum β γ) → Sum (Prod α β) (Prod α γ) :=
+sorry
+
+/-
+Using the analogy between types and arithmetic, write a function that turns
+multiplication by two into a sum. In other words,
+it should have type Bool × α → α ⊕ α.
+-/
+
+def multsum (a : Prod Bool α) : Sum α α :=
+sorry
+
