@@ -53,3 +53,32 @@ ofNat := Even.fromNat n
 #eval (8 : Even)
 #eval (8 : Even) + (8 : Even)
 #eval (8 : Even) * (8 : Even)
+
+
+/-
+There is a limit to how many times the Lean compiler will attempt a recursive
+instance search. This places a limit on the size of even number literals
+defined in the previous exercise. Experimentally determine what the limit is.
+-/
+--I didn't need a recursive instance search, just going to check how big
+--i can get it b4 it crashes
+
+--#eval (22222 : Even) --stack overflow
+#eval (2222 : Even) --fine
+#eval (5000 : Even) --fine
+#eval (10000 : Even) --fine
+--#eval (20000 : Even) --stack overflow
+--#eval (15000 : Even) --stack overflow
+--#eval (12500 : Even) --stack overflow
+--#eval (11250 : Even) --stack overflow
+--#eval (10625 : Even) --stack overflow
+#eval (10312 : Even) --fine
+#eval (10312 : Even) --fine
+#eval (10600 : Even) --fine
+--#eval (10620 : Even) --stack overflow
+#eval (10610 : Even) --fine
+#eval (10614 : Even) --fine
+#eval (10614 : Even) --fine
+--#eval (10616 : Even) --stack overflow
+
+--Limit is 10614
