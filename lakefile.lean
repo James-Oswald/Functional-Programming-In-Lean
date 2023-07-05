@@ -9,7 +9,7 @@ lean_lib «FunctionalProgrammingInLean» {
   -- add library configuration options here
 }
 
-@[default_target]
+--@[default_target]
 lean_exe «Functional-Programming-In-Lean» {
   root := `Main
 }

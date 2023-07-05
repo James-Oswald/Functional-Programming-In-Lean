@@ -41,5 +41,13 @@ instance : Monad Option where
     | none => none
     | some x => next x
 
-example [Monad m] (f : α → m β) (o : Option): m.bind (m.pure o) f = f o := 
-  by simp
+#check Pure.pure
+#check Bind.bind
+#check Monad Option
+--#eval pure (some 3 : Option Nat)
+
+example [Monad m] (f : Option α → m (Option α)) (o : Option α):
+bind (pure o) f = f o := by
+  simp [Monad]
+
+
