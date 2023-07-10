@@ -46,8 +46,10 @@ instance : Monad Option where
 #check Monad Option
 --#eval pure (some 3 : Option Nat)
 
+--I can't prove the monad contract :(
 example [Monad m] (f : Option α → m (Option α)) (o : Option α):
 bind (pure o) f = f o := by
   simp [Monad]
+  sorry
 
 
