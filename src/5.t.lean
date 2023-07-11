@@ -22,4 +22,9 @@ deriving Repr
 #check Monad Option
 #check Monad List 
 
-#check 
+
+
+
+
+#check Option Empty
+#check Option.some 
