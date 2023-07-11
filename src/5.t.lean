@@ -27,4 +27,6 @@ deriving Repr
 
 
 #check Option Empty
-#check Option.some 
+#check @Option.some Empty
+
+example (x : X)
