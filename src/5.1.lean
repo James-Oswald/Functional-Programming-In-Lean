@@ -47,7 +47,9 @@ bind item func :=
   | COption.none => COption.none
   | COption.some arg => func arg
 
-
+/-
+Definition of the moand contract as translated by me in 5.1
+-/
 def monadContract (m : Type → Type) (α β : Type) [Monad m] : Prop :=
 -- pure should be a left identity of bind
 (∀(f : α → m β) (v : α), bind (pure v) f = f v) ∧ 
@@ -57,7 +59,7 @@ def monadContract (m : Type → Type) (α β : Type) [Monad m] : Prop :=
 (∀(v : m α) (f : α → m β) (g : β → m α), 
   bind (bind v f) g = bind v (fun x => bind (f x) g))
 
---COption satisfies the monad contract, for real
+--COption satisfies the monad contract
 example {α β : Type}: monadContract COption α β 
 := by{
   rw [monadContract]
@@ -100,10 +102,6 @@ instance : Monad BOption where
   pure arg := BOption.some arg
   bind _ _ := BOption.none
 
-#check Option
-#check bind
-#check pure
-
 theorem L2: ∀(p : Prop), ¬¬p <-> p :=
 by{
   intro p;
@@ -124,7 +122,42 @@ by{
   }
 }  
 
---[iβ : Nonempty β] [iα : Nonempty α]
+--For BOption to violate the monad contract α must be non-empty
+--BOption actually violates the monad contract for all non-empty types.
+
+--The monad contract does hold when α is empty
+example : monadContract BOption Empty β := by{
+  unhygienic
+  rw [monadContract];
+  apply And.intro;{
+    intros f v;
+    rw [pure, Applicative.toPure, Monad.toApplicative, instMonadBOption]
+    simp
+    rw [bind, Monad.toBind]
+    simp
+    --follows from empty type
+    trivial
+  }
+  apply And.intro;
+  {
+    intros v;
+    rw [pure, Applicative.toPure, Monad.toApplicative, instMonadBOption]
+    simp
+    rw [bind, Monad.toBind]
+    simp
+    --v can only be BOption.none
+    cases v;
+    --follows from empty type
+    simp [Empty.rec]
+    trivial;
+  }
+  {
+    intros v f g;
+    rw [bind, Monad.toBind, instMonadBOption];
+  }
+}
+
+--Proof that B violates the monad contract for all non-empty types
 example {α β : Type} [iα : Nonempty α]:
 ¬monadContract BOption α β 
 := by{
@@ -142,8 +175,9 @@ example {α β : Type} [iα : Nonempty α]:
 
 
 
+--Some scratch work and wrong directions in no particular order
 
---Some scratch work and wrong directions
+--===========================================================
 
 -- example {α β : Type} [iβ : Nonempty β] [iα : Nonempty α]:
 -- ¬monadContract BOption α β 
@@ -153,6 +187,25 @@ example {α β : Type} [iα : Nonempty α]:
 --   intro H;
 --   rw [L2] at H;
 
+-- }
+
+
+-- --If BOption satisfies the monad contract α is nonempty
+-- theorem monadNonempty :
+-- monadContract BOption α β -> Nonempty α 
+-- := by{
+--   unhygienic
+--   intros H;
+--   apply Classical.byContradiction;
+--   intro H2;
+--   have H3 : Empty = α := sorry;
+--   rw [monadContract] at H;
+--   cases H;
+--   cases right;
+
+--   -- rw [monadContract] at H;
+--   -- have fw : α -> BOption β := fun (_ : α) => BOption.none;
+--   -- have 
 -- }
 
 -- example (f : α → BOption β) (o : α):
@@ -234,6 +287,8 @@ theorem L1 (α : Type) (p : α->Prop) :
   }
 } 
 
+--weaker version of 
+
 --Proof BOption does not satisfy the monad contract. I'm 
 --only able to prove this so far assuming β and α are nonempty types
 example {α β : Type} [iβ : Nonempty β] [iα : Nonempty α]:
@@ -253,3 +308,29 @@ example {α β : Type} [iβ : Nonempty β] [iα : Nonempty α]:
       Monad.toApplicative, instMonadBOption] at H;
   simp at H;
 }
+
+--This is false, monadContract BOption Empty β holds
+-- example {α β : Type}:
+-- ¬monadContract BOption α β 
+-- := by{
+--   unhygienic
+--   apply Classical.byContradiction _;
+--   intros H;
+--   rw [L2] at H;
+--   rw [monadContract] at H;
+--   cases H;
+--   cases right;
+--   cases Classical.em (Nonempty α);
+--   cases Classical.em (Nonempty β);
+--   {
+--     have H2 := left_1 (BOption.some (Classical.choice h));
+--     rw [bind, Monad.toBind, instMonadBOption] at H2;
+--     simp at H2;
+--   }{
+--     have H2 := left_1 (BOption.some (Classical.choice h));
+--     rw [bind, Monad.toBind, instMonadBOption] at H2;
+--     simp at H2;
+--   }{
+
+--   }
+-- }
