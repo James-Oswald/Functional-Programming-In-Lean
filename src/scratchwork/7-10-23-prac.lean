@@ -1,4 +1,6 @@
 
+--I wrote this before I knew you could use ';'s for ending proofs 
+
 #check 1 = 1
 
 def linearSearchRecur [DecidableEq α] : List α -> α -> Nat -> Option Nat 
