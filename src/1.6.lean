@@ -130,16 +130,11 @@ by{
 #print prodOverSumProofVersion
 #check Sum
 
---Ok just kidding now for the real version 
+--Ok just kidding now for the real version, unsure how you're supposted to figure
+--this out this early in the book, there must be an easier way.
 def prodOverSum : α × (β ⊕ γ) → (α × β) ⊕ (α × γ)
-| a, inl b => Prod a b  
-| a, inr g => Prod a g
-
-match input.snd with
-| inl (val : β) => 
-  Sum.mk 
-  (Prod.mk input.fst 
-  ) (Prod.mk )
+| (a, (Sum.inl b)) => @Sum.inl _ (α × γ) (Prod.mk a b)
+| (a, (Sum.inr g)) => @Sum.inr _ (α × γ) (Prod.mk a g)
 
 /-
 Using the analogy between types and arithmetic, write a function that turns
@@ -147,6 +142,14 @@ multiplication by two into a sum. In other words,
 it should have type Bool × α → α ⊕ α.
 -/
 
-def multsum (a : Prod Bool α) : Sum α α :=
-sorry
+def multsumProofVersion: Bool × α -> α ⊕ α := by{
+  unhygienic
+  intro H;
+  cases H;
+  apply Sum.inr;
+  exact snd;
+}
 
+def multSum: Bool × α -> α ⊕ α
+| (true, a) => @Sum.inl _ α a  
+| (false, a) => @Sum.inr _ α a 
