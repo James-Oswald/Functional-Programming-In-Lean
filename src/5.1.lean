@@ -33,9 +33,8 @@ Both methods have the correct type. Why does this instance
 violate the monad contract?
 -/
 
-#check Option
-#check Pure
-
+/-My convincing argument is a proof in lean that it satisfies the monad contract.-/
+--Start by defining a custom version of option and the original monad instance for it.
 inductive COption (α : Type) : Type
 | none : COption α
 | some : α -> COption α
@@ -59,36 +58,36 @@ def monadContract (m : Type → Type) (α β : Type) [Monad m] : Prop :=
 (∀(v : m α) (f : α → m β) (g : β → m α), 
   bind (bind v f) g = bind v (fun x => bind (f x) g))
 
---COption satisfies the monad contract
+--Prove COption satisfies the monad contract
 example {α β : Type}: monadContract COption α β 
 := by{
   rw [monadContract]
-  apply And.intro{
+  apply And.intro;{
     --left identity
     intros f v;
     rw [pure, Applicative.toPure, Monad.toApplicative,
       instMonadCOption]
     simp
-    rw [bind, Monad.toBind]
+    --rw [bind, Monad.toBind]
   }
-  apply And.intro{
+  apply And.intro;{
     --right identity
     intros v;
     rw [bind, Monad.toBind, instMonadCOption]
     simp;
     cases v;{
       trivial;
-    }{
+    };{
       trivial;
     }
-  }{
+  };{
     --associative
     intros v f g;
     rw [bind, Monad.toBind, instMonadCOption];
     simp;
     cases v;{
       trivial;
-    }{
+    };{
       trivial;
     }
   }
@@ -105,7 +104,7 @@ instance : Monad BOption where
 theorem L2: ∀(p : Prop), ¬¬p <-> p :=
 by{
   intro p;
-  apply Iff.intro{
+  apply Iff.intro;{
     intro H;
     rewrite [Not, Not] at H;
     apply Classical.byContradiction;
@@ -113,7 +112,7 @@ by{
     apply H;
     intro;
     contradiction;
-  }{
+  };{
     intro H;
     rewrite [Not, Not];
     intro H2;
@@ -133,7 +132,7 @@ example : monadContract BOption Empty β := by{
     intros f v;
     rw [pure, Applicative.toPure, Monad.toApplicative, instMonadBOption]
     simp
-    rw [bind, Monad.toBind]
+    --rw [bind, Monad.toBind]
     simp
     --follows from empty type
     trivial
@@ -143,7 +142,7 @@ example : monadContract BOption Empty β := by{
     intros v;
     rw [pure, Applicative.toPure, Monad.toApplicative, instMonadBOption]
     simp
-    rw [bind, Monad.toBind]
+    --rw [bind, Monad.toBind]
     simp
     --v can only be BOption.none
     cases v;
@@ -237,7 +236,7 @@ bind (pure o) f = f o := by{
   rw [pure, Applicative.toPure, Monad.toApplicative,
    instMonadCOption]
   simp
-  rw [bind, Monad.toBind]
+  --rw [bind, Monad.toBind]
 }
 
 --Again but using a dedicated Prop so i can prove the
@@ -253,8 +252,8 @@ example {α β : Type}: monadContractLeft COption α β
   rw [monadContractLeft, pure, Applicative.toPure,
       Monad.toApplicative, instMonadCOption]
   simp
-  rw [bind, Monad.toBind]
-  simp
+  --rw [bind, Monad.toBind]
+  --simp
 }
 
 #check Exists.intro
@@ -266,7 +265,7 @@ theorem L1 (α : Type) (p : α->Prop) :
 (¬∀(x : α),p x) <-> (∃(x : α),¬(p x))
 := by{
   rw [Not];
-  apply Iff.intro{
+  apply Iff.intro;{
     intro H;
     apply Classical.byContradiction;
     intro H2;
@@ -278,7 +277,7 @@ theorem L1 (α : Type) (p : α->Prop) :
     apply H2;
     apply Exists.intro x;
     exact H3;
-  }{
+  };{
     intros H1 H2;
     apply Exists.elim H1;
     intros x npx;
