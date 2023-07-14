@@ -33,8 +33,11 @@ Both methods have the correct type. Why does this instance
 violate the monad contract?
 -/
 
-/-My convincing argument is a proof in lean that it satisfies the monad contract.-/
---Start by defining a custom version of option and the original monad instance for it.
+/-
+My convincing argument is a proof in lean that it satisfies the monad contract.
+I start by defining a custom version of option and the "legal" monad instance for it.
+-/
+
 inductive COption (α : Type) : Type
 | none : COption α
 | some : α -> COption α
@@ -47,7 +50,7 @@ bind item func :=
   | COption.some arg => func arg
 
 /-
-Definition of the moand contract as translated by me in 5.1
+Definition of the moand contract as translated from the section in the book
 -/
 def monadContract (m : Type → Type) (α β : Type) [Monad m] : Prop :=
 -- pure should be a left identity of bind
@@ -93,6 +96,12 @@ example {α β : Type}: monadContract COption α β
   }
 }
 
+/-
+Part 2: Why does this instance
+violate the monad contract?
+
+Start by defining the new instance
+-/
 inductive BOption (α : Type) : Type
 | none : BOption α
 | some : α -> BOption α
@@ -101,6 +110,10 @@ instance : Monad BOption where
   pure arg := BOption.some arg
   bind _ _ := BOption.none
 
+/-
+Helper theorem for double negation elim
+because I was too lazy to look for this
+-/
 theorem L2: ∀(p : Prop), ¬¬p <-> p :=
 by{
   intro p;
@@ -121,8 +134,12 @@ by{
   }
 }  
 
---For BOption to violate the monad contract α must be non-empty
---BOption actually violates the monad contract for all non-empty types.
+/-
+To prove that BOption voilates the monad contract we must show there exists 
+some conditions under which it is false, we will show that for every α
+other than Empty, BOption voilates the monad contract. We will also
+show that it holds when α is empty. 
+-/
 
 --The monad contract does hold when α is empty
 example : monadContract BOption Empty β := by{
