@@ -189,13 +189,14 @@ theorem inAppendedList (e: α) (l1 l2 : List α) : e ∈ l1 -> e ∈ l1 ++ l2
   intro H;
   induction l1;
   contradiction;
-  cases inList e H{
+  cases inList e H;{
     have headOfL1isHeadOfAppended (h : α) {t l2 : List α} :
     (h :: t) ++ l2 = h :: (t ++ l2) := by rfl; 
     rw [headOfL1isHeadOfAppended];
     simp;
     rw [<-h]
-    exact List.Mem.head e (tail ++ l2);
+    exact @List.Mem.head α e (tail ++ l2);
+    --exact List.Mem.head e (tail ++ l2);
   };{
     apply List.Mem.tail;
     apply tail_ih;
@@ -253,3 +254,59 @@ by{
     exact q; 
   }
 }
+
+def InfrenceRule.OrIntroRight {α : Type} (φ ψ : NDFormula α) (Γ : List (NDFormula α)) :
+InfrenceRule α := 
+⟨[Γ ⊢ₙ φ], Γ ⊢ₙ φ ∨ₙ ψ, InfrenceRule.noRestrictions⟩
+
+theorem InfrenceRule.OrIntroRight.Valid (φ ψ : NDFormula α) (Γ : List (NDFormula α)) :
+InfrenceRule.valid (InfrenceRule.OrIntroRight φ ψ Γ) :=
+by{
+  rw [InfrenceRule.valid];
+  intros i;
+  rw [InfrenceRule.sat];
+  intros s res;
+  rw [OrIntroRight] at *;
+  simp at *;
+  rw [Sequent.sat];
+  simp;
+  intros H;
+  rw [NDFormula.sat];
+  have s2 := s (Γ ⊢ₙ φ);
+  rw [Sequent.sat] at s2;
+  simp at s2;
+  apply Or.inl;
+  apply s2;
+  apply trivialListMembership;
+  exact H;
+}
+
+def InfrenceRule.OrIntroLeft {α : Type} (φ ψ : NDFormula α) (Γ : List (NDFormula α)) :
+InfrenceRule α := 
+⟨[Γ ⊢ₙ φ], Γ ⊢ₙ ψ ∨ₙ φ, InfrenceRule.noRestrictions⟩
+
+theorem InfrenceRule.OrIntroLeft.Valid (φ ψ : NDFormula α) (Γ : List (NDFormula α)) :
+InfrenceRule.valid (InfrenceRule.OrIntroLeft φ ψ Γ) :=
+by{
+  rw [InfrenceRule.valid];
+  intros i;
+  rw [InfrenceRule.sat];
+  intros s res;
+  rw [OrIntroLeft] at *;
+  simp at *;
+  rw [Sequent.sat];
+  simp;
+  intros H;
+  rw [NDFormula.sat];
+  have s2 := s (Γ ⊢ₙ φ);
+  rw [Sequent.sat] at s2;
+  simp at s2;
+  apply Or.inr;
+  apply s2;
+  apply trivialListMembership;
+  exact H;
+}
+
+def InfrenceRule.NotIntro {α : Type} (φ ψ : NDFormula α) (Γ : List (NDFormula α)) :
+InfrenceRule α := 
+⟨[Γ ⊢ₙ φ, Γ ⊢ₙ ¬ₙφ], Γ ⊢ₙ ψ ∨ₙ φ, InfrenceRule.noRestrictions⟩
